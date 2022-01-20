@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="no-js" lang="">
+  <head>
+    <meta charset="utf-8" />
+    <title>Document</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <p>Hello</p>
+
+    <h3>Register Form</h3>
+    <form id="register-form">
+      <input type="email" name="email" />
+      <input type="password" name="password" />
+      <button type="submit">Register</button>
+    </form>
+
+    <br />
+    <hr />
+    <br />
+
+    <h3>Login Form</h3>
+    <form id="login-form">
+      <input type="email" name="email" />
+      <input type="password" name="password" />
+      <button type="submit">Login</button>
+    </form>
+
+    <h4>2FA Token</h4>
+    <form id="auth-token">
+      <label for="token"><input type="text" name="token" /></label>
+      <button type="submit">Submit</button>
+    </form>
+
+    <br />
+    <hr />
+    <br />
+
+    <h3>Change Password</h3>
+    <form id="change-form">
+      <label for="oldPassword">Old password</label>
+      <input type="password" name="oldPassword" />
+      <label for="newPassword">New password</label>
+      <input type="password" name="newPassword" />
+      <button type="submit">Change Password</button>
+    </form>
+
+    <br />
+    <hr />
+    <br />
+
+    <h3>Forgot Password</h3>
+    <form id="forgot-password-form">
+      <label for="email">Email</label>
+      <input type="email" name="email" />
+      <button type="submit">Send Forgot Email</button>
+    </form>
+
+    <br />
+    <hr />
+    <br />
+
+    <button id="logout">Logout</button>
+
+    <br />
+    <hr />
+    <br />
+
+    <script>
+      function getValues(form) {
+        return Object.values(form).reduce((obj, field) => {
+          if (field.name) {
+            obj[field.name] = field.value
+          }
+          return obj
+        }, {})
+      }
+
+      ;(() => {
+        const registerForm = document.getElementById('register-form')
+        registerForm.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          try {
+            const values = getValues(registerForm)
+
+            await fetch('http://localhost:3000/api/register', {
+              method: 'POST',
+              body: JSON.stringify(values),
+              credentials: 'include',
+              headers: { 'Content-type': 'application/json; charset: UTF-8' },
+            })
+          } catch (e) {
+            console.error(e)
+          }
+        })
+
+        const loginForm = document.getElementById('login-form')
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          try {
+            const values = getValues(loginForm)
+
+            const res = await fetch('http://localhost:3000/api/authorize', {
+              method: 'POST',
+              body: JSON.stringify(values),
+              credentials: 'include',
+              headers: { 'Content-type': 'application/json; charset: UTF-8' },
+            })
+            const loginData = await res.json()
+            if (loginData.data.status === '2FA') {
+              const authTokenForm = document.getElementById('auth-token')
+              authTokenForm.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                try {
+                  const tokenValues = getValues(authTokenForm)
+
+                  const tokenRes = await fetch(
+                    'http://localhost:3000/api/verify-2fa',
+                    {
+                      method: 'POST',
+                      body: JSON.stringify({ ...values, ...tokenValues }),
+                      credentials: 'include',
+                      headers: {
+                        'Content-type': 'application/json; charset: UTF-8',
+                      },
+                    }
+                  )
+                } catch (e) {
+                  console.error(e)
+                }
+              })
+            }
+          } catch (e) {
+            console.error(e)
+          }
+        })
+
+        const changeForm = document.getElementById('change-form')
+        changeForm.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          try {
+            const values = getValues(changeForm)
+
+            await fetch('http://localhost:3000/api/change-password', {
+              method: 'POST',
+              body: JSON.stringify(values),
+              credentials: 'include',
+              headers: { 'Content-type': 'application/json; charset: UTF-8' },
+            })
+          } catch (e) {
+            console.error(e)
+          }
+        })
+
+        const forgotForm = document.getElementById('forgot-password-form')
+        forgotForm.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          try {
+            const values = getValues(forgotForm)
+
+            await fetch('http://localhost:3000/api/forgot-password', {
+              method: 'POST',
+              body: JSON.stringify(values),
+              credentials: 'include',
+              headers: { 'Content-type': 'application/json; charset: UTF-8' },
+            })
+          } catch (e) {
+            console.error(e)
+          }
+        })
+
+        const logoutButton = document.getElementById('logout')
+        logoutButton.addEventListener('click', async (e) => {
+          try {
+            const res = await fetch('http://localhost:3000/api/logout', {
+              method: 'POST',
+              credentials: 'include',
+            })
+          } catch (e) {
+            console.error(e)
+          }
+        })
+      })()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "node-auth2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chanaka Wijethilaka",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "fastify": "^3.25.3",
+    "fastify-cookie": "^5.5.0",
+    "fastify-cors": "^6.0.2",
+    "fastify-static": "^4.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.2.2",
+    "nodemailer": "^6.7.2",
+    "otplib": "^12.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.6.0",
+    "prettier": "^2.5.1"
+  }
+}
